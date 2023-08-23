@@ -1,9 +1,19 @@
-from helper import *
+#### Handy functions
+def add_restoringbeamtable(imagename):
+        ia.open(imagename)
+        shape = ia.shape()
+        restoringbeam = ia.restoringbeam()
+        ia.close()
+        for i in range(shape[0]):
+                ia.open(imagename)
+                ia.setrestoringbeam(beam=restoringbeam, channel = i, polarization = 0, remove=True)
+                ia.close()
+####
 
+#### 
 filename_12m7mtp = 'data/cloudA/cloudA_12m+7m+tp_n2hp10'
 filename_12m7m = 'data/cloudA/cloudA_12m+7m_n2hp10'
 filename_tp = 'data/cloudA/cloudA_tp_n2hp10'
-
 
 vis=['%s.ms' %filename_12m7m] 
 cell=['0.5arcsec'] 
@@ -38,10 +48,12 @@ sdpsf=''
 sdgain=1.0
 dishdia=12.0
 
-do_clean = True
+do_clean = False
 do_sdprep = True
-do_feather = True
+do_feather = False
 do_sdintimaging = False
+####
+
 
 if do_clean:
 
