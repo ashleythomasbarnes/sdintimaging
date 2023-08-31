@@ -1,22 +1,4 @@
-#### Handy functions
-def add_restoringbeamtable(imagename):
-
-       cube_info = imhead(imagename, mode='list')
-       n_chan = cube_info['shape'][-1]
-       n_pol = cube_info['shape'][-2]
-
-       ia.open(imagename)
-       restoring_beam = ia.restoringbeam()
-       ia.setrestoringbeam(remove=True)
-       for c in range(n_chan):
-              for p in range(n_pol):
-                     ia.setrestoringbeam(beam=restoring_beam, channel=c, polarization=p)
-       ia.close()
-       imhead(imagename, 'put', 'CASAMBM', 'T')
-####
-
-
-
+from functions import *
 
 #### 
 do_clean = False
@@ -24,7 +6,7 @@ do_sdprep = False
 do_iramprep = False
 do_feather = False
 do_sdintimaging = False
-do_sdintimaging_iram = True
+do_sdintimaging_iram = False
 
 input_dir = 'data/cloudA'
 filename_12m7mtp = f'{input_dir}/cloudA_12m+7m+tp_n2hp10'
@@ -107,6 +89,11 @@ if do_clean:
               growiterations=growiterations, 
               minpercentchange=minpercentchange)
 
+       exportfits(imagename='%s_tclean.image.pbcor'%filename_12m7m,
+              fitsimage='%s_tclean.image.pbcor.fits'%filename_12m7m,
+              velocity=True,
+              overwrite=True)
+
 
 ##################
 if do_sdprep: 
@@ -169,6 +156,15 @@ if do_feather:
               highres='%s_tclean.image.pbcor'%filename_12m7m, 
               lowres='%s_regrid_trans.image'%filename_iram)
 
+       exportfits(imagename='%s_tcleanfeather.image'%filename_12m7mtp,
+              fitsimage='%s_tcleanfeather.image.fits'%filename_12m7mtp,
+              velocity=True,
+              overwrite=True)
+
+       exportfits(imagename='%s_tcleanfeather.image'%filename_12m7miram,
+              fitsimage='%s_tcleanfeather.image.fits'%filename_12m7miram,
+              velocity=True,
+              overwrite=True)
 
 ##################
 if do_sdintimaging:
@@ -211,6 +207,11 @@ if do_sdintimaging:
               growiterations=growiterations, 
               minpercentchange=minpercentchange)
 
+       exportfits(imagename='%s_sdintimaging.joint.cube.image.pbcor'%filename_12m7mtp,
+              fitsimage='%s_sdintimaging.joint.cube.image.pbcor.fits'%filename_12m7mtp,
+              velocity=True,
+              overwrite=True)
+
        sdimage='%s_regrid_trans_beams.image'%filename_tp
        sdintimaging(usedata=usedata,
               sdimage=sdimage,
@@ -244,6 +245,11 @@ if do_sdintimaging:
               minbeamfrac=minbeamfrac, 
               growiterations=growiterations, 
               minpercentchange=minpercentchange)
+
+       exportfits(imagename='%s_sdintimaging_beams.joint.cube.image.pbcor'%filename_12m7mtp,
+              fitsimage='%s_sdintimaging_beams.joint.cube.image.pbcor.fits'%filename_12m7mtp,
+              velocity=True,
+              overwrite=True)
 
 ##################
 if do_sdintimaging_iram:
@@ -285,3 +291,8 @@ if do_sdintimaging_iram:
               minbeamfrac=minbeamfrac, 
               growiterations=growiterations, 
               minpercentchange=minpercentchange)
+
+       exportfits(imagename='%s_sdintimaging.joint.cube.image.pbcor'%filename_12m7miram,
+              fitsimage='%s_sdintimaging.joint.cube.image.pbcor.fits'%filename_12m7miram,
+              velocity=True,
+              overwrite=True)
