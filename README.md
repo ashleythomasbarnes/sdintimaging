@@ -16,7 +16,7 @@ tbd
 imregrid::ImageRegrid::regrid (file /source/casa6/casatools/casacore/casacore/images/Images/ImageRegrid.tcc, line 89)Cannot find the observatory name UNKNOWN in the CASA
 ```
       
-## `cloudA_updateheader.ipynb`
+## `cloudA_updateheader.py`
 
 The script processes a FITS file containing astronomical data of a spectral cube. Initially, it loads the data and extracts the necessary header information. The data, which is initially in units of Kelvin (K), is then converted to Jansky per beam (Jy/beam) using the given beam dimensions and rest frequency from the header. The code subsequently modifies certain header parameters, like the projection types for spatial axes, and sets placeholders for the telescope and instrument names. With the help of the `spectral_cube` library, the spectral axis of the cube is altered, converting its units from frequency to velocity and then back to frequency. Finally, the modified data, along with its updated header, is saved to a new FITS file, potentially overwriting any existing file with the same name.
 
