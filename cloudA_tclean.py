@@ -23,7 +23,7 @@ do_clean = False
 do_sdprep = False
 do_iramprep = False
 do_feather = False
-do_sdintimaging = True
+do_sdintimaging = False
 do_sdintimaging_iram = True
 
 input_dir = 'data/cloudA'
@@ -66,7 +66,6 @@ minpercentchange=1.0
 usedata='sdint'
 sdpsf=''
 sdgain=1.0
-dishdia=12.0
 ####
 
 
@@ -174,6 +173,8 @@ if do_feather:
 ##################
 if do_sdintimaging:
 
+       dishdia=12.0
+
        os.system('rm -rf %s_sdintimaging*' %filename_12m7mtp)
 
        sdimage='%s_regrid_trans.image'%filename_tp
@@ -246,6 +247,8 @@ if do_sdintimaging:
 
 ##################
 if do_sdintimaging_iram:
+       
+       dishdia=30.0
 
        os.system('rm -rf %s_sdintimaging*' %filename_12m7miram)
 
