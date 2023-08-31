@@ -1,8 +1,26 @@
 # sdintimaging
  
-This script appears to be related to radio astronomy data processing, specifically for creating images from interferometric and single-dish data.
+This project creates combined images from interferometric and single-dish data.
 
-**Summary:**
+## Summary
+
+If including data from the e.g. IRAM-30m, first run `update_headers.ipynb` to get the data into the correct format. If you're only interested in combining with TP from ALMA, then this shouldn't be a problem and you don't need to run this step. The main issues this solves in the IRAM data are the following:
+ - changes the RA and Dec to -TAN projection
+    - without this raises issue using 'importfits'
+```
+tbd
+```
+ - updating 'TELESCOP' and 'INSTRUME' in the header to 'ALMA' as IRAM-30m isn't supported in CASA
+    - without this raises the following issue using 'imregrid' (which is needed to do spectral regridding before `sdintimaging`)     
+```
+imregrid::ImageRegrid::regrid (file /source/casa6/casatools/casacore/casacore/images/Images/ImageRegrid.tcc, line 89)Cannot find the observatory name UNKNOWN in the CASA
+```
+      
+## `update_headers.ipynb`
+
+The notebook processes a FITS file containing astronomical data of a spectral cube. Initially, it loads the data and extracts the necessary header information. The data, which is initially in units of Kelvin (K), is then converted to Jansky per beam (Jy/beam) using the given beam dimensions and rest frequency from the header. The code subsequently modifies certain header parameters, like the projection types for spatial axes, and sets placeholders for the telescope and instrument names. With the help of the `spectral_cube` library, the spectral axis of the cube is altered, converting its units from frequency to velocity and then back to frequency. Finally, the modified data, along with its updated header, is saved to a new FITS file, potentially overwriting any existing file with the same name.
+
+## `cloudA_tclean.py`
 
 1. **Handy functions**: A function `add_restoringbeamtable` is defined. It modifies the restoring beam information of a CASA image cube.
 
