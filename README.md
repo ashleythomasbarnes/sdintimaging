@@ -2,6 +2,8 @@
  
 This project creates combined images from interferometric and single-dish data.
 
+Test data here: https://www.dropbox.com/scl/fo/eatg6fskssf1du1ovilaq/h?rlkey=f1j4h34vyecvvkrkisw1xlh1b&dl=0 
+
 ## Summary
 
 If including data from the e.g. IRAM-30m, first run `update_headers.ipynb` to get the data into the correct format. If you're only interested in combining with TP from ALMA, then this shouldn't be a problem and you don't need to run this step. The main issues this solves in the IRAM data are the following:
