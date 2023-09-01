@@ -10,7 +10,8 @@ If including data from the e.g. IRAM-30m, first run `update_headers.ipynb` to ge
  - changes the RA and Dec to -TAN projection
     - without this raises issue using 'importfits'
 ```
-tbd
+2023-09-01 09:33:34	SEVERE	importfits::image::open (file src/tools/image/image_cmpt.cc, line 4208)	Exception Reported: wcs wcsset_error: Ill-conditioned coordinate transformation parameter
+2023-09-01 09:33:34	SEVERE	importfits::::casa	Exception Reported: Error in importfits: wcs wcsset_error: Ill-conditioned coordinate transformation parameter
 ```
  - updating 'TELESCOP' and 'INSTRUME' in the header to 'ALMA' as IRAM-30m isn't supported in CASA
     - without this raises the following issue using 'imregrid' (which is needed to do spectral regridding before `sdintimaging`)     
