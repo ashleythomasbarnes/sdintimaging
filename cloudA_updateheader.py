@@ -6,48 +6,55 @@ from spectral_cube import SpectralCube
 
 inputfile = './data/cloudA/cloudA_iram_n2hp10_old.fits'
 outputfile = './data/cloudA/cloudA_iram_n2hp10.fits'
-freq_new = 9.317340200000E+10 * u.Hz  # Define the new reference frequency
-
+freq_new = 9.3173402E+10 * u.Hz  # Define the new reference frequency
 
 
 # Load the FITS file containing the cube data
 hdu = fits.open(inputfile)[0] # Open the FITS file and get the first HDU (Header/Data Unit)
+cube = SpectralCube.read(inputfile)  # Open the FITS file
 header = hdu.header  # Extract the header from the HDU
 data = hdu.data  # Extract the data (cube) from the HDU
 
 # Convert the data from Kelvin to Jansky per beam
-bmaj = header['BMAJ'] * u.deg  # Major axis of the beam in degrees
-bmin = header['BMIN'] * u.deg  # Minor axis of the beam in degrees
+if cube.unit == u.K:
+    
+    print('[INFO] Converting to units from K to Jy/beam')
 
-# Conversion factor from FWHM to sigma for Gaussian beams
-fwhm_to_sigma = 1. / (8 * np.log(2))**0.5
+    bmaj = header['BMAJ'] * u.deg  # Major axis of the beam in degrees
+    bmin = header['BMIN'] * u.deg  # Minor axis of the beam in degrees
 
-# Calculate the area of the beam
-beam_area = 2. * np.pi * (bmaj * bmin * fwhm_to_sigma**2)
+    # Conversion factor from FWHM to sigma for Gaussian beams
+    fwhm_to_sigma = 1. / (8 * np.log(2))**0.5
 
-# Extract rest frequency from the header and convert to Hz
-freq = header['RESTFREQ'] * u.Hz
+    # Calculate the area of the beam
+    beam_area = 2. * np.pi * (bmaj * bmin * fwhm_to_sigma**2)
 
-# Define the equivalency for converting brightness temperature to flux density
-equiv = u.brightness_temperature(freq)
+    # Extract rest frequency from the header and convert to Hz
+    freq = header['RESTFREQ'] * u.Hz
 
-# Convert the data from Kelvin to Jansky per beam area
-data = data * (u.K).to(u.Jy / beam_area, equivalencies=equiv)
-header['BUNIT'] = 'Jy/beam'  # Update the unit in the header
+    # Define the equivalency for converting brightness temperature to flux density
+    equiv = u.brightness_temperature(freq)
+
+    # Convert the data from Kelvin to Jansky per beam area
+    data = data * (u.K).to(u.Jy / beam_area, equivalencies=equiv)
+    header['BUNIT'] = 'Jy/beam'  # Update the unit in the header
+
+# Update header with new projection types for the spatial axes
+if 'TAN' not in header['CTYPE1']:
+
+    print('[INFO] Manually updating projection to TAN - still needs testing...')
+    header['CTYPE1'] = 'RA---TAN'  # Right Ascension with tangent projection
+    header['CTYPE2'] = 'DEC--TAN'  # Declination with tangent projection
+
+    # Remove any PV (Projection Value) cards from the header as they are not needed
+    del header['PV*']
 
 # Create a new HDU with the modified data and header
 hdu_new = fits.PrimaryHDU(data, header)
 
-# Remove any PV (Projection Value) cards from the header as they are not needed
-del hdu_new.header['PV*']
-
-# Update header with new projection types for the spatial axes
-hdu_new.header['CTYPE1'] = 'RA---TAN'  # Right Ascension with tangent projection
-hdu_new.header['CTYPE2'] = 'DEC--TAN'  # Declination with tangent projection
-
-# Set placeholders for telescope and instrument (assuming ALMA for this example)
-hdu_new.header['TELESCOP'] = 'ALMA'
-hdu_new.header['INSTRUME'] = 'ALMA'
+# # Set placeholders for telescope and instrument (assuming ALMA for this example)
+# hdu_new.header['TELESCOP'] = 'ALMA'
+# hdu_new.header['INSTRUME'] = 'ALMA'
 
 # Update the spectral axis using the spectral_cube library
 cube = SpectralCube.read(hdu_new)
