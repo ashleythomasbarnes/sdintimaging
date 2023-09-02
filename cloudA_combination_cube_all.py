@@ -1,10 +1,12 @@
-from functions import *
+# from functions import *
+execfile('functions.py')
 
 #### 
 do_clean = False
-do_sdprep = False
+do_sdprep = True
 do_iramprep = False
-do_feather = False
+do_feather = True
+do_feather_iram = False
 do_sdintimaging = False
 do_sdintimaging_iram = False
 
@@ -110,6 +112,7 @@ if do_sdprep:
               overwrite=True,
               output='%s_regrid.image'%filename_tp)
 
+       os.system('rm -rf %s_regrid_trans.image'%filename_tp)
        imtrans(imagename='%s_regrid.image'%filename_tp,
               outfile='%s_regrid_trans.image'%filename_tp,
               order=['rig', 'declin', 'stok', 'frequ'])
@@ -135,6 +138,7 @@ if do_iramprep:
               overwrite=True,
               output='%s_regrid.image'%filename_iram)
 
+       os.system('rm -rf %s_regrid_trans.image'%filename_tp)
        imtrans(imagename='%s_regrid.image'%filename_iram,
               outfile='%s_regrid_trans.image'%filename_iram,
               order=['rig', 'declin', 'stok', 'frequ'])
@@ -146,20 +150,26 @@ if do_iramprep:
 ##################
 if do_feather:
 
-       os.system(f'rm -rf {input_dir}/*_tcleanfeather*')
+       os.system('rm -rf %s_tcleanfeather.image'%filename_12m7mtp)
 
        feather(imagename='%s_tcleanfeather.image'%filename_12m7mtp,
               highres='%s_tclean.image.pbcor'%filename_12m7m, 
               lowres='%s_regrid_trans.image'%filename_tp)
 
-       feather(imagename='%s_tcleanfeather.image'%filename_12m7miram,
-              highres='%s_tclean.image.pbcor'%filename_12m7m, 
-              lowres='%s_regrid_trans.image'%filename_iram)
 
        exportfits(imagename='%s_tcleanfeather.image'%filename_12m7mtp,
               fitsimage='%s_tcleanfeather.image.fits'%filename_12m7mtp,
               velocity=True,
               overwrite=True)
+
+##################
+if do_feather_iram:
+
+       os.system('rm -rf %s_tcleanfeather.image'%filename_12m7miram)
+
+       feather(imagename='%s_tcleanfeather.image'%filename_12m7miram,
+              highres='%s_tclean.image.pbcor'%filename_12m7m, 
+              lowres='%s_regrid_trans.image'%filename_iram)
 
        exportfits(imagename='%s_tcleanfeather.image'%filename_12m7miram,
               fitsimage='%s_tcleanfeather.image.fits'%filename_12m7miram,
