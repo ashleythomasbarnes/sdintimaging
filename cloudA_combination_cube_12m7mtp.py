@@ -200,7 +200,7 @@ if stats_diff2['mean'][0]>0.3:
        print('[WARNING] Emission mean >3 sigma different between tclean and sdintclean')
 else: 
        check2 = True
-       print('[INFO] Emission mean >3 sigma different between tclean and sdintclean')
+       print('[INFO] Emission mean <3 sigma different between tclean and sdintclean')
 
 if check1 & check2: 
        print('[WARNING] Checks passed!')
