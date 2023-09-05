@@ -3,6 +3,9 @@ input_dir = 'data/cloudA'
 filename_12m7mtp = f'{input_dir}/cloudA_12m+7m+tp_n2hp10_single'
 filename_12m7m = f'{input_dir}/cloudA_12m+7m_n2hp10_single'
 filename_tp = f'{input_dir}/cloudA_tp_n2hp10_single'
+
+filename_12m7mtp_tclean = f'{input_dir}/cloudA_12m+7m+tp_n2hp10_single_tcleanfeather.image'
+filename_12m7mtp_sdint = f'{input_dir}/cloudA_12m+7m+tp_n2hp10_single_sdintimaging.joint.cube.image.pbcor'
 ####
 
 ################## Run tclean 
@@ -150,3 +153,51 @@ exportfits(imagename='%s_sdintimaging.joint.cube.image.pbcor'%filename_12m7mtp,
        fitsimage='%s_sdintimaging.joint.cube.image.pbcor.fits'%filename_12m7mtp,
        velocity=True,
        overwrite=True)
+
+################## Run stats
+print('[INFO] Running stats...')
+
+for file in [filename_12m7mtp_sdint, filename_12m7mtp_tclean]:
+       
+       print(f'[INFO] Importing {file}')
+
+       importfits(fitsimage='%s.fits'%file,
+                            imagename='%s'%file,
+                            overwrite=True)
+
+stats_rms = imstat(imagename=filename_12m7mtp_sdint)
+rms = stats_rms['rms']
+
+os.system('rm -rf %s/immath_diff1.image'%input_dir)
+immath(imagename=[filename_12m7mtp_tclean, 
+                                   filename_12m7mtp_sdint],
+              outfile='%s/immath_diff1.image'%input_dir,
+              expr='(IM1-IM0)/iif((IM1/%f)>3,IM1,100000)' %rms)
+
+os.system('rm -rf %s/immath_diff2.image'%input_dir)
+immath(imagename=[filename_12m7mtp_tclean, 
+                                   filename_12m7mtp_sdint],
+              outfile='%s/immath_diff2.image'%input_dir,
+              expr='abs((IM1-IM0)/%f)'%rms)
+
+stats_diff1 = imstat(imagename='%s/immath_diff1.image'%input_dir)
+stats_diff2 = imstat(imagename='%s/immath_diff2.image'%input_dir)
+
+if stats_diff1['max'][0]>0.3: 
+       check1 = False
+       print('[WARNING] Emission peaks >30 percent different between tclean and sdintclean')
+else: 
+       check1 = True
+       print('[INFO] Emission peaks <30 percent different between tclean and sdintclean')
+
+if stats_diff2['mean'][0]>0.3: 
+       check2 = False
+       print('[WARNING] Emission mean >3 sigma different between tclean and sdintclean')
+else: 
+       check2 = True
+       print('[INFO] Emission mean >3 sigma different between tclean and sdintclean')
+
+if check1 & check2: 
+       print('[WARNING] Checks passed!')
+else:
+       print('[INFO] One or more checks failed!')
